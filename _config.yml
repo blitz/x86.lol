@@ -1,0 +1,25 @@
+# Site settings
+title: A Journey into Obscure x86 Details
+author: Julian Stecklina
+email: js+x86lol@alien8.de
+description: >- # this means to ignore newlines until "baseurl:"
+  x86 has lots of weird corners that we are going to explore in this blog.
+  Nothing is too legacy to not be be posted about!
+baseurl: "" # the subpath of your site, e.g. /blog
+url: "https://x86.lol" # the base hostname & protocol for your site, e.g. http://example.com
+twitter_username: blitzclone
+github_username:  blitz
+
+authors:
+  julian:
+    name: Julian Stecklina
+    display_name: Julian
+    email: js+x86lol@alien8.de
+    twitter: blitzclone
+    github: blitz
+
+# Build settings
+markdown: kramdown
+theme: minima
+plugins:
+  - jekyll-feed
