@@ -1,7 +1,6 @@
 ---
 layout: post
 title:  "Welcome!"
-date:   2019-01-30 02:19:22+01:00
 categories: generic
 author: julian
 ---
