@@ -138,10 +138,10 @@ distinct ways of encoding them.
 This is already messy enough, but there are special cases in the instruction set
 that don't really fit in any nice scheme at all. For example, `movabs` is the
 only instruction with an 8-byte immediate value. Or there are legacy prefixes
-that are re-used in SSE instructions to modify them. The `repnz`
+that are re-used in SSE instructions to modify them, such as the `repnz`
 (Repeat-Non-Zero) legacy prefix that switches a `addps` (add packed single
 float) instruction to a `addpd` (add packed double float) instruction. Also
-segment selector overrides have been re-used as branch-taken/branch-not-take
+segment selector overrides have been re-used as branch-taken/branch-not-taken
 hints that have since been abandoned. The list goes on. It's just plain crazy.
 
 All of this raises some questions:
