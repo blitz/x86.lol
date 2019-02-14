@@ -53,7 +53,7 @@ the long encoding of the instruction.
 
 Let's put this knowledge into practice. I've crafted a [small program](https://github.com/blitz/x86.lol-examples/blob/master/steganography/main.cpp)
 that contains lots of `xor` instructions operating on the `eax` register. I also
-have a [Python script](https://github.com/blitz/x86.lol-examples/blob/master/steganography/main.cpp)
+have a [Python script](https://github.com/blitz/x86.lol-examples/blob/master/steganography/embed.py)
 that takes an assembly file and embeds a message bit-by-bit by switching between
 the different encodings of `xor`.
 
