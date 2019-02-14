@@ -120,4 +120,16 @@ the reader.
 
 Maybe now is a good time to head over to [https://reproducible-builds.org/](https://reproducible-builds.org/).
 
+### Update (2019-02-14)
+
+A [Twitter user](https://twitter.com/FPerriot/status/1095638480863092736)
+pointed me to this [excellent
+paper](https://www1.cs.columbia.edu/~angelos/Papers/hydan.pdf) that follows a
+similar, but not identical path for embedding data into executables. The paper
+has a couple of good references and is a good read for anyone interested in the
+topic. The main difference is that the authors select from different but
+equivalent instructions to embed data, i.e. `sub eax, -5` instead of `add eax,
+5`, while my toy example selected from different encodings for the same
+instruction.
+
 [modrm]: https://wiki.osdev.org/X86-64_Instruction_Encoding#ModR.2FM_and_SIB_bytes
