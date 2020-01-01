@@ -3,3 +3,4 @@ gem 'github-pages', group: :jekyll_plugins
 gem 'jekyll-feed'
 
 gem "jekyll", "~> 3.8"
+gem "bigdecimal"
