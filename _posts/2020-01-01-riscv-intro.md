@@ -117,4 +117,11 @@ even easier to work with for beginners.
 
 Stay tuned for more RISC-V content from an x86 angle in future posts.
 
+## Update (2020-01-07)
+
+A reader [pointed out](https://github.com/blitz/x86.lol/issues/5) that
+there is also the [Renode](https://renode.readthedocs.io/en/latest/)
+simulator that has support for the HiFive Unleashed board. Looks
+interesting!
+
 [intelsdm]: https://software.intel.com/en-us/articles/intel-sdm
