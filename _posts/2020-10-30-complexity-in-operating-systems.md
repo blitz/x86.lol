@@ -18,7 +18,9 @@ provided by the firmware, probing individual features, etc. The most
 painful example of this I've seen so far is figuring out which
 interrupt a particular PCI interrupt line is routed to. It's worth a
 set of posts, but until then, feel free to checkout [this
-description](https://habr.com/en/post/501912/).
+description](https://habr.com/en/post/501912/). (If it's down, it's
+also cached by
+[Google](https://webcache.googleusercontent.com/search?q=cache:CXZUV61m7hwJ:https://habr.com/en/post/501912/+&cd=1&hl=en&ct=clnk).)
 
 The second issue is **resource management**. Essentially, how do you
 hand out and eventually reclaim all the resources you discovered. For
