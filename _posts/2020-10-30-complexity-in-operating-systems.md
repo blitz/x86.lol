@@ -11,7 +11,7 @@ systems. Operating systems are usually incredibly complex beasts. I
 think there are mainly three drivers of this complexity. Surprisingly
 enough, neither of these is having to deal with hardware.
 
-The first one is resource **discovery**, i.e. figuring out how the
+The first one is resource **discovery**, i.e. figuring out what the
 computer the OS is running on actually looks like. On x86, this
 involves parsing countless bitfields, tables, executing byte code
 provided by the firmware, probing individual features, etc. The most
