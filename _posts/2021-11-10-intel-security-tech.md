@@ -82,12 +82,13 @@ keys are used on is fully exploited. Maybe you want to keep your
 crypto keys for yourself, even if the cloud provider that runs your
 code is untrustworthy.
 
-SGX allows creation of "enclaves" whose state live in encrypted
-memory.  These enclaves only have distinct entry and exit points to
-the "insecure" world around it. Otherwise, they are a black box. The
-main selling point is that even the operating system kernel cannot
-peek into enclaves. The OS is still in control of executing enclaves,
-though, so SGX cannot guarantee
+SGX allows creation of "enclaves" whose state live in encrypted memory
+(when it is not currently in registers or various CPU caches). These
+enclaves only have distinct entry and exit points to the "insecure"
+world around it. Otherwise, they are a black box. The main selling
+point is that even the operating system kernel cannot peek into
+enclaves. The OS is still in control of executing enclaves, though, so
+SGX cannot guarantee
 [availabilty](https://en.wikipedia.org/wiki/Information_security#Key_concepts).
 It does a good job at protecting integrity and confidentiality of data
 in enclaves (caveats below).
@@ -106,8 +107,20 @@ vulnerablities. Check out [Foreshadow](https://foreshadowattack.eu/),
 [Plundervolt](https://plundervolt.com/), [Load Value
 Injection](https://lviattack.eu/), …
 
-Besides the hardware security issues, the programming model is
-involved. You have to create something like
+Besides the hardware security issues, there are also unique attack
+methods that would not be in the attacker model for other
+technologies. Because the operating system can freely schedule
+enclaves how it wants, enclaves can be [effectively
+single-stepped](https://github.com/jovanbulck/sgx-step). Single-stepping
+enclaves allows for fine grained observation of changes to
+microarchitectural state. This in turn allows attackers to leak
+secrets from enclaves when they use libraries that are
+[vulnerable](https://www.bearssl.org/constanttime.html) to these kinds
+of attacks.
+
+Let's leave the security issues behind and look at the programmer
+experience. The enclave programming model is involved. You have to
+create something like
 [RPC](https://en.wikipedia.org/wiki/Remote_procedure_call) entry
 points into your enclave code. And code that runs in enclaves, is not
 magically secure. So any vulnerability in your enclave code can be
@@ -141,3 +154,9 @@ Next time, I'll discuss Intel MKTME and TDX. Do you have questions or
 suggestions for other Intel CPU technologies to write about? Ping me
 on [Twitter](https://twitter.com/blitzclone/).
 
+# Update 2021-11-14
+
+I've revised the SGX section and incorporated [feedback
+from](https://twitter.com/_msw_/status/1458843278892146708)
+[msw](https://twitter.com/_msw_/status/1458846427090538499) regarding
+SGX security.
