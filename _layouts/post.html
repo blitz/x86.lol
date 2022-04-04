@@ -11,7 +11,7 @@ layout: default
         {{ page.date | date: date_format }}
       </time>
       {%- if page.modified_date -%}
-        ~ 
+        ~
         {%- assign mdate = page.modified_date | date_to_xmlschema -%}
         <time class="dt-modified" datetime="{{ mdate }}" itemprop="dateModified">
           {{ mdate | date: date_format }}
@@ -33,6 +33,30 @@ layout: default
   {%- if site.disqus.shortname -%}
     {%- include disqus_comments.html -%}
   {%- endif -%}
+
+  {% assign cat = page.categories[0] %}
+  {% assign cat_list = site.categories[cat] %}
+  {% for post in cat_list %}
+    {% if post.url == page.url %}
+        {% assign pOffset = forloop.index0 | minus: 1 %}
+        {% assign nOffset = pOffset | plus: 2 %}
+        {% if forloop.first == false %}
+          {% assign next_post = cat_list[pOffset] %}
+        {% endif %}
+        {% if forloop.last == false %}
+          {% assign previous_post = cat_list[nOffset] %}
+        {% endif %}
+        {% break %}
+    {% endif %}
+  {% endfor %}
+
+  {% if previous_post %}
+  <a href="{{previous_post.url | relative_url}}">{{previous_post.title}} 👈</a>
+  {% endif %}
+
+  {% if next_post %}
+  <div style="text-align: right"><a href="{{next_post.url | relative_url}}">👉 {{next_post.title}}</a></p>
+  {% endif %}
 
   <a class="u-url" href="{{ page.url | relative_url }}" hidden></a>
 </article>
