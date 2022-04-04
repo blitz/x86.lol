@@ -122,18 +122,24 @@ Intel that they introduced with the Pentium II in 1997. AMD came up with a
 similar but incompatible instruction pair `syscall`/`sysret` with the K6-2 in
 1998[^instlat].
 
-Both of these instruction pairs work pretty the same. Instead of having to
-consult descriptor tables in memory for what to do most of the functionality is
-hardcoded and the unused flexibility is lost: `sysenter` and `syscall` assume a
-flat memory model and load segment descriptors with fixed values. They are also
-incompatible with any non-standard use of the privilege levels.
+Both of these instruction pairs work pretty much the same. Instead of
+having to consult descriptor tables in memory for what to do, most of
+the functionality is hardcoded and the unused flexibility is lost:
+`sysenter` and `syscall` assume a flat memory model and load segment
+descriptors with fixed values. They are also incompatible with any
+non-standard use of the privilege levels.
 
 A kernel-accessible [model-specific
-register](https://en.wikipedia.org/wiki/Model-specific_register) (MSR) points to
-the kernel's system call entry point. `sysenter` also switches to the kernel
-stack in this way. The processor does not have to interpret data structures in
-memory. The return address is left in a general-purpose register for the kernel
-to save wherever it wants to.
+register](https://en.wikipedia.org/wiki/Model-specific_register) (MSR)
+points to the kernel's system call entry point. `sysenter` also
+switches to the kernel stack in this way. The processor does not have
+to interpret data structures in memory, as opposed to the Call Gate or
+software interrupt case.
+
+Saving the instruction pointer where the kernel should return to works
+differently with `sysenter` and `syscall` as well.`syscall` saves the
+instruction pointer in the `RCX` register.  `sysenter` leaves the
+caller to specify where the system call should return to.
 
 I've done microbencharks (code is on
 [Github](https://github.com/blitz/kernel_entry_benchmark)) of the cost of these
