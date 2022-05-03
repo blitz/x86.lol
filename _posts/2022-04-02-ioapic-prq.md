@@ -77,3 +77,23 @@ We have questions:
 
 If you have information, please share it with us via Twitter or email
 (see below). We are confused.
+
+## Update 2022-05-03
+
+Checkout [this
+thread](https://twitter.com/blitzclone/status/1521223791556407297) on
+Twitter for additional information:
+
+The IOAPIC always delivers interrupts via the Pin Assertion Register
+as level-triggered, regardless of the configuration.
+
+The best source for the role of the Pin Assertion Register so far is
+the [Intel® Server System S7000FC4UR Technical Product
+Specification](https://www.manualslib.com/manual/1402147/Intel-S7000fc4ur.html?page=124):
+
+> The "Fake MSI" scheme allows PCI Express devices running on a legacy operating
+system to use the MSI mechanism to generate INTx compatible interrupts. This is accomplished
+by targeting the MSI memory write to an I/OxAPIC. [...] When Fake MSI is enabled, the PCI Express devices generate a memory transaction with an address equal to I/OxAPIC_MEM_BAR + 0x20 (PAR) and a 32-bit data equal to the interrupt
+vector number corresponding to the device. This information is stored in the device's MSI
+address and data registers, and would be initialized by the system firmware (BIOS) prior to
+booting a non-MSI aware operating system.
