@@ -23,3 +23,9 @@ highlighter: rouge
 theme: minima
 plugins:
   - jekyll-feed
+
+exclude:
+  - "*.nix"
+  - "*.lock"
+  - "Gemfile"
+  - "result*"
