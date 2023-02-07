@@ -1,169 +1,163 @@
 ---
 layout: post
-title:  "Intel TDX: Hypervisor as Firmware"
+title:  "The Flawed Design of Intel TDX"
 categories: generic
 author: julian
 published: true
 ---
 
-This post discusses Intel's Trust Domain Extensions (TDX). This
-instruction set extension is Intel's latest attempt at implementing a
-[Trusted Execution Environment
+This post discusses my personal opinion of Intel's Trust Domain
+Extensions (TDX). This instruction set extension is Intel's latest
+attempt at implementing a [Trusted Execution Environment
 (TEE)](https://en.wikipedia.org/wiki/Trusted_execution_environment).
 
-This [previous post]({% post_url 2021-11-10-intel-security-tech %})
-discussed older Intel security technologies, such as
-[SGX](https://en.wikipedia.org/wiki/Software_Guard_Extensions). You
-might want to re-read that post for context.
+This post does not make an attempt at trying to explain TDX. I assume
+that you have a familiarity with Intel TDX at the conceptual
+level. Intel has a [large set of
+documents](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html)
+about TDX. [The introductory
+overview](https://cdrdv2.intel.com/v1/dl/getContent/690419) does a
+good job of getting you started and should be enough background for
+this post. Otherwise, I'm assuming general knowledge about how
+virtualization works.
 
-I'm assuming general knowledge about hardware virtualization on
-x86. Specifically, I assume that you roughly know what [VM
-exits](https://revers.engineering/day-5-vmexits-interrupts-cpuid-emulation/)
-are and how [nested
-paging](https://revers.engineering/mmu-ept-technical-details/) works at a
-conceptual level.
+## tl;dr
 
-In this blog post, I'm going to explain what TDX does from a
-hypervisor engineer's perspective. The goal is to give you enough
-overview knowledge to make sense of the [Intel
-documentation](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html). There
-may be a follow-up blog post with my personal opinion about it.
+Instead of increasing the complexity of the hardware, we can have a
+software-only alternative to TDX with the same security properties and
+fewer downsides. We can achieve this using a secure microhypervisor
+that uses existing security features of the CPU, such as
+[TXT](https://en.wikipedia.org/wiki/Trusted_Execution_Technology) and
+[TME-MK](https://www.intel.com/content/www/us/en/developer/articles/news/runtime-encryption-of-memory-with-intel-tme-mk.html). This
+approach would also be portable to other CPU architectures.
 
-# What Intel TDX Intends to Do
+## Longer Version
 
-The goal of Intel TDX is very similar to that of Intel SGX: The
-ability to run code on systems where you trust neither the operating
-system nor hypervisor. The difference is that SGX forces the
-programmer into a very restricted programming model, while Intel TDX
-runs full virtual machines (VMs).
+Behind the design of TDX there are some unspoken assumptions:
 
-In principle, the idea is neat. A cloud provider gives you the ability
-to run your VM, but you don't have to trust the cloud provider. You
-only have to trust Intel, which you do anyway, if you run your code on
-an Intel CPU. As such, TDX moves the cloud provider out of the
-[Trusted Computing Base
-(TCB)](https://en.wikipedia.org/wiki/Trusted_computing_base) for the
-[integrity and
-confidentiality](https://en.wikipedia.org/wiki/Information_security#Key_concepts)
-of the service that your VM provides.
+1. Existing hypervisors are beyond repair from a security perspective
+   and cannot be trusted.
+2. Intel can write a microhypervisor (the _TDX Module_) that is secure.
 
-Just as Intel SGX, TDX does not help with availability. This is fine,
-because if the cloud provider stops running your VM, you can just buy
-compute time somewhere else.
+I'm calling the TDX Module a microhypervisor, because it has a large
+overlap with the functionality commonly found in microhypervisors. It
+manages vCPU state and nested page tables, while relying on VMMs
+running in lower privilege levels to do emulation. This is very
+similar to how microhypervisor-based systems work, such as [this
+one](http://hypervisor.org/).
 
-So far so good. At this level, Intel TDX is much easier to explain
-than Intel SGX. But the devil is in the implementation.
+Regarding the security of existing hypervisors, there are definitely
+problems. Linux/KVM on x86 has a lot of emulation code[^kvmx86] that
+is directly accessible by a malicious guest, is written in C and runs
+with now guard rails whatsoever. Applying Google's [Rule of
+2](https://chromium.googlesource.com/chromium/src/+/master/docs/security/rule-of-2.md)
+this places the system squarely in the **DOOM!** category.
 
-# The Intel TDX Module
+[^kvmx86]: KVM on x86 does instruction decoding, instruction emulation
+    and some legacy device emulation. While you can opt out of the
+    legacy device emulation (`kernel-irqchip=split`), there is no way
+    to opt out of the kernel's instruction emulation. Also on all
+    platforms you can use VirtIO emulation in the kernel (vhost) and
+    open another large attack surface.
 
-Guaranteeing confidentiality and integrity of a whole VM without
-trusting the hypervisor is hard. Intel has not solved this problem,
-but moved the security-critical part of the hypervisor into the
-firmware. Intel calls this piece of hypervisor firmware the _Intel TDX
-Module_ (or TDX module for short).
+The conclusion that Intel has drawn out of these assumptions is they
+introduce a new CPU mode (SEAM mode) where they place their
+microhypervisor. This microhypervisor comes as an [Authenticated Code
+Module
+(ACM)](https://edk2-docs.gitbook.io/understanding-the-uefi-secure-boot-chain/secure_boot_chain_in_uefi/intel_boot_guard),
+which must be cryptograhically signed by Intel. The existing
+hypervisor then has to use system calls using a new set of
+instructions (`SEAMCALL`) to the microhypervisor that is actually in
+charge. The VMs have to use new instructions (`TDCALL`) to interact
+with the outside as well.
 
-When I say hypervisor from here on, I mean the "normal" hypervisor
-(such as KVM or Hyper-V) that interacts with the TDX module.
+### TDX Downsides
 
-The hypervisor sets up and interacts with VMs using what's effectively
-a set of system calls to the TDX module. To do that, Intel introduces
-a new instruction `SEAMCALL`. With these system calls, the hypervisor
-can create VMs, add guest memory and create vCPUs, while the TDX
-module takes the proper security precautions.
+While this design has more hope of adoption than [SGX]({% post_url
+2021-11-10-intel-security-tech %}), the design comes with many
+downsides.
 
-# How TDX Provides Security
+TDX increases hardware complexity. While adding instructions is not
+helping, adding a new CPU _mode_ feels an order of magnitude more
+costly. Intel needs to make sure that everything the CPU already
+supports works correctly in this new mode. How well Intel can cope
+with hardware complexity can be seen with Spectre/Meltdown or any
+errata sheet.
 
-The job of the TDX module is to protect the VM from the remaining
-operating system. To do that, TDX needs to protect guest memory and
-guest register state from the hypervisor.
+TDX locks out any other provider of the microhypervisor in charge of
+the system by requiring the TDX module to come with an Intel
+signature. Everything points to Intel never signing someone else's
+code. Especially if you are not a hyperscaler, there is really nothing
+to hope for here.
 
-TDX prevents access to guest memory by encrypting it. To do that, TDX
-employs [MKTME](https://en.wikichip.org/wiki/x86/tme). Intel extends
-MKTME to protect confidentiality _and_ integrity of memory.
+TDX gives the end user an extremely poor experience for security
+issues. You are basically at the mercy of Intel. As long as Intel
+doesn't ship an update of the TDX module, there is nothing you can do
+on your own. Also no one will get advance warning for issues except
+big players.
 
-Preventing the hypervisor from accessing register state is harder.
-VM exits, such as EPT violations that occur for MMIO emulation,
-typically require the hypervisor to access and modify the complete CPU
-state including the instruction pointer.
+On Twitter, [I was
+joking](https://twitter.com/blitzclone/status/1531751195697635330)
+that the TDX module is probably written in shoddy C. Whether it's
+shoddy is anyone's personal opinion, but it turns out that it _is_
+actually written in C. Intel has published [its
+source](https://www.intel.com/content/www/us/en/download/738875/738876/intel-trust-domain-extension-intel-tdx-module.html). Would
+you want the software you base all your security hopes on to be
+written in the [least secure programming
+language](https://portswigger.net/daily-swig/c-is-least-secure-programming-language-study-claims)?
 
-With the power to modify registers the hypervisor can just execute
-arbitrary code in the guest with chosen input values by maliciously
-setting the instruction pointer and general purpose registers. The TDX
-module must let the hypervisor handle these exits. Allowing the
-hypervisor to handle VM exits would break the security properties.
+### A Better Way
 
-To avoid this security hole, TDX forces guests to use what's also
-effectively system calls to request emulation from the hypervisor. For
-that Intel introduces the `TDCALL` instruction. Guests use `TDCALL` to
-request MMIO emulation.
+If you can write a secure microhypervisor (one of the assumptions of
+TDX), there is actually no need to go down the road of TDX. Intel
+already provide all the building blocks of a solution that gives you
+the benefits of TDX with far fewer downsides.
 
-# TDX MMIO Emulation Example
+Boot your secure microhypervisor as a normal [baremetal
+hypervisor](https://en.wikipedia.org/wiki/Hypervisor#Classification). The
+boot process can be secured via Secure Boot. You can perform [remote
+attestation](https://en.wikipedia.org/wiki/Trusted_Computing#Remote_attestation)
+as well. For this [Intel
+TXT](https://en.wikipedia.org/wiki/Trusted_Execution_Technology) comes
+in handy. The microhypervisor can defend itself at runtime using an
+[IOMMU](https://en.wikipedia.org/wiki/Input%E2%80%93output_memory_management_unit)
+and defend VMs using
+[TME-MK](https://www.intel.com/content/www/us/en/developer/articles/news/runtime-encryption-of-memory-with-intel-tme-mk.html).
 
-To put everything in context, let's look at how the hypervisor runs a
-vCPU and handles a MMIO request. The flow is as follows (as far as I
-can tell from the docs):
+Your legacy hypervisor can then boot as a sort of
+[Dom0](https://wiki.xenproject.org/wiki/Dom0) and take ownership of
+the platform hardware. Instead of calling into the TDX module, the
+Dom0 can request services from the secure microhypervisor using
+[regular
+hypercalls](https://www.felixcloutier.com/x86/vmcall). Instead of
+patching untrusted guests to use `TDCALL` to call into the TDX module,
+they can use existing facilities as well.
 
-1. The hypervisor starts the vCPU by executing a `SEAMCALL`
-   instruction to request a vCPU to run with the `TDH.VP.ENTER`
-   function.
-1. The TDX module retrieves the vCPU state and does the traditional
-   `VMRESUME` to enter the guest.
-1. The guest executes and requests emulation services using the
-   `TDCALL` instruction with the `TDG.VP.VMCALL` function.
-1. The TDX module reflects the guest's request back to the hypervisor
-   as the return value of `SEAMCALL`.
+This design gives you all the upsides of TDX. The secure
+microhypervisor will enforce confidentiality protections to the degree
+that you need them. At the same time, the design eliminates
+practically all downsides of TDX. The update process of the secure
+hypervisor does not involve Intel. If you establish your own chain of
+trust, you can update the hypervisor as you please. Also, Secure Boot
+(with your own keys) and TXT are usable by anyone.
 
-There are more examples in the TDX documentation. See for example
-section "10.1 VCPU Transitions" in the [Intel TDX Module Base
-Specification
-1.5](https://www.intel.com/content/www/us/en/developer/articles/technical/intel-trust-domain-extensions.html).
+You are free to implement the secure microhypervisor in any language
+you want. You can write it in
+[Ada/SPARK](https://en.wikipedia.org/wiki/SPARK_(programming_language))
+or Rust for maximum resiliency. **At least not in C.** You can do
+formal verification. You can do fuzzing. Whatever makes you feel
+comfortable.
 
-# Handling Interrupts
+You can move the emulation code (Qemu or your favorite alternative)
+from the Dom0 into host root mode outside of Dom0. The microhypervisor
+can run it in a sandbox with only clearly defined access to the rest
+of the system. This removes the need to patch your guest OS or
+firmware and make it TDX aware, because it will just see a normal
+emulated system. Even less complexity!
 
-The above example covers _synchronous_ exits from the guest. But to
-drive the platform the hypervisor also needs to be able to interrupt
-guests when timer or device interrupts happen.
+Finally, equivalents of Secure Boot, TXT, TME-MK exist for AMD and
+other architectures. You can have the same architecture everywhere.
 
-TDX handles interrupts using _asynchronous_ exits. In this case, the
-`SEAMCALL` from the hypervisor returns indicating that a host
-interrupt (or similar) occurred. After the hypervisor has finished
-handling the interrupt, it continues guest execution using `SEAMCALL`.
-
-When handling asynchronous events, the hypervisor does not get a
-chance to directly modify any vCPU state.
-
-# Some Words about Performance
-
-At this point, the seasoned hypervisor engineer will suspect that TDX
-introduces noticeable runtime overhead. I'm assuming that memory
-encryption can be handled efficiently in hardware, but VM exits that
-traverse the TDX module to the hypervisor will be expensive. The extra
-cost comes from the additional TDX module entry and exit.
-
-A good bet is that Intel will eventually need to add expensive
-cache/branch predictor/etc flushing instructions to secure the
-transition to and from the TDX module. This will further slow things
-down.
-
-# Securing the TDX Module
-
-We've discussed how TDX protects VMs from the hypervisor, but we also
-need to talk about TDX protects the TDX module from the hypervisor.
-
-To secure the TDX module has invented the _SEAM_ mode, a new CPU
-mode. SEAM creates an isolated bubble in memory where the TDX Module
-runs. The firmware configures this memory region via the SEAM Range
-Register (SEAMRR).
-
-To make sure that _only_ the Intel-provided TDX module is placed in
-the SEAM bubble, the platform goes through a pretty convoluted loading
-process involving [Intel
-TXT](https://www.intel.com/content/www/us/en/developer/articles/tool/intel-trusted-execution-technology.html). This
-process is out of scope for this post, but if you are interested there
-are a lot of details in [the architectural
-specification](https://www.intel.com/content/dam/develop/external/us/en/documents-tps/intel-tdx-cpu-architectural-specification.pdf).
-
-# Parting Words
-
-...
-
+But instead we got TDX. And unfortunately other CPU architectures
+([RISC-V](https://fosdem.org/2023/schedule/event/cc_riscv/)) have
+taken it as an example. This makes me sad.
