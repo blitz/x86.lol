@@ -20,7 +20,10 @@
 
       systems = [
         "x86_64-linux"
-        "aarch64-linux"
+
+        # Disabled, because pre-commit fails.
+        #
+        # "aarch64-linux"
       ];
 
       perSystem = { config, system, pkgs, ... }: {
