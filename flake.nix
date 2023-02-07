@@ -20,9 +20,7 @@
 
       systems = [
         "x86_64-linux"
-
-        # Not actively tested, but should work:
-        # "aarch64-linux"
+        "aarch64-linux"
       ];
 
       perSystem = { config, system, pkgs, ... }: {
