@@ -42,7 +42,7 @@ signed.
 
 For UKI, the boot flow looks like this.
 
-1. UEFI verifies and loads sytemd-boot.
+1. UEFI verifies and loads systemd-boot.
 2. systemd-boot looks for UKIs and the user can select one to boot.
 3. systemd-boot loads and starts the UKI.
 4. The UKI boots the Linux kernel and intrd that it finds embedded in
@@ -85,7 +85,7 @@ development environment is nice. No need for
 [`build-std`](https://doc.rust-lang.org/nightly/cargo/reference/unstable.html#build-std)
 anymore. I also want to highlight the
 [rust-osdev/uefi-rs](https://github.com/rust-osdev/uefi-rs)
-project. It helps enourmously to take the hassle out of dealing with
+project. It helps enormously to take the hassle out of dealing with
 UEFI.
 
 # Integration in Nixpkgs

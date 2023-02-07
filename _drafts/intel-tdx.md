@@ -126,7 +126,7 @@ guests when timer or device interrupts happen.
 
 TDX handles interrupts using _asynchronous_ exits. In this case, the
 `SEAMCALL` from the hypervisor returns indicating that a host
-interrupt (or similar) occured. After the hypervisor has finished
+interrupt (or similar) occurred. After the hypervisor has finished
 handling the interrupt, it continues guest execution using `SEAMCALL`.
 
 When handling asynchronous events, the hypervisor does not get a
@@ -135,7 +135,7 @@ chance to directly modify any vCPU state.
 # Some Words about Performance
 
 At this point, the seasoned hypervisor engineer will suspect that TDX
-introduces noticable runtime overhead. I'm assuming that memory
+introduces noticeable runtime overhead. I'm assuming that memory
 encryption can be handled efficiently in hardware, but VM exits that
 traverse the TDX module to the hypervisor will be expensive. The extra
 cost comes from the additional TDX module entry and exit.

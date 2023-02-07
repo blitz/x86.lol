@@ -61,6 +61,6 @@ this approach and narrow down which hypervisor software stack is used.
 One usecase I can think of is to build malware that is tailored to recognize its
 target using instruction fetch fingerprinting. Let's say the malware's target is
 an embedded system with an ancient x86 CPU. If it is actively fingerprinting the
-CPU, it can avoid deploying its payload in an automated malware anlysis system
+CPU, it can avoid deploying its payload in an automated malware analysis system
 and be discovered, unless the malware analysis is performed on the exact same
 type of system targeted by the malware.

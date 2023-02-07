@@ -104,7 +104,7 @@ Linux source code comments.
 ## Parting Words
 
 If this post sounded overly negative, this is not intended. I'm
-personally very excited about RISC-V and its possiblities. If the
+personally very excited about RISC-V and its possibilities. If the
 amount of assembly I have to write to get a toy kernel going is any
 indication, RISC-V wins hands down.
 

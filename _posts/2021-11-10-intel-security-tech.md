@@ -76,7 +76,7 @@ We live in a world, where most code runs on infrastructure that is not
 trusted by the author of the code. Consider the [Digital Restrictions
 Management](https://fsfe.org/activities/drm/drm.en.html) (DRM)
 usecase: A video streaming service wants to prevent users from
-creating copies of videos they have payed for. Another (better)
+creating copies of videos they have paid for. Another (better)
 usecase is holding on to secret keys even when the system where these
 keys are used on is fully exploited. Maybe you want to keep your
 crypto keys for yourself, even if the cloud provider that runs your
@@ -89,7 +89,7 @@ world around it. Otherwise, they are a black box. The main selling
 point is that even the operating system kernel cannot peek into
 enclaves. The OS is still in control of executing enclaves, though, so
 SGX cannot guarantee
-[availabilty](https://en.wikipedia.org/wiki/Information_security#Key_concepts).
+[availability](https://en.wikipedia.org/wiki/Information_security#Key_concepts).
 It does a good job at protecting integrity and confidentiality of data
 in enclaves (caveats below).
 
@@ -103,7 +103,7 @@ access it). With this an enclave can prove its legitimacy to a server
 over the network, receive crypto material and keep it safe.
 
 SGX was hit in the nuts pretty hard by the whole lot of CPU
-vulnerablities. Check out [Foreshadow](https://foreshadowattack.eu/),
+vulnerabilities. Check out [Foreshadow](https://foreshadowattack.eu/),
 [Plundervolt](https://plundervolt.com/), [Load Value
 Injection](https://lviattack.eu/), …
 
