@@ -65,12 +65,22 @@
           default = config.packages.blog;
         };
 
-        devShells.default = pkgs.mkShell {
-          packages = [ config.packages.jekyll_env ];
+        devShells = {
+          watch = pkgs.mkShell {
+            packages = [ config.packages.jekyll_env ];
 
-          shellHook = ''
-            exec jekyll serve --watch --drafts
-          '';
+            shellHook = ''
+              exec jekyll serve --watch --drafts
+            '';
+          };
+
+          default = pkgs.mkShell {
+            packages = [ config.packages.jekyll_env ];
+
+            shellHook = ''
+              ${config.pre-commit.installationScript}
+            '';
+          };
         };
       };
     };
