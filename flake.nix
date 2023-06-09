@@ -44,6 +44,7 @@
               excludes = [
                 ".*\\.png$"
                 ".*\\.webp$"
+                "gemset\\.nix"
               ];
             };
           };
