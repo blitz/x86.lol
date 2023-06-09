@@ -85,7 +85,15 @@
           };
 
           default = pkgs.mkShell {
-            packages = [ config.packages.jekyll_env ];
+            packages = [
+              config.packages.jekyll_env
+
+              # For updating Jekyll.
+              pkgs.bundler
+              pkgs.bundix
+              pkgs.gnumake
+              pkgs.gcc
+            ];
 
             shellHook = ''
               ${config.pre-commit.installationScript}
