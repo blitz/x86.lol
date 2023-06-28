@@ -1,0 +1,95 @@
+---
+layout: post
+title:  "Intel TDX Doesn't Protect You from the Cloud"
+categories: generic
+author: julian
+published: true
+---
+
+This post is a continuation of my [previous post about Intel TDX]({% post_url
+2023-02-07-intel-tdx %}). It's
+worth a read before reading this post. As before, I'm not going to
+introduce TDX itself. If you need a refresher, Intel has [good overview
+material]((https://cdrdv2.intel.com/v1/dl/getContent/690419)) available.
+
+## tl;dr
+
+While Intel TDX does make some attacks by the cloud vendor harder, you
+still have to trust the cloud vendor unless you go to extreme
+lengths. We need to build trustworthy virtualization stacks instead of
+hoping for the silver bullet from CPU vendors.
+
+## Longer Version
+
+Let's take Intel TDX's promises at face value. When everything goes
+well, TDX provides CPU state and memory integrity. This is useful
+because it prevents trivial attacks on VMs from a compromised
+hypervisor. The hypervisor cannot read secrets directly from memory or
+inject code.
+
+The problem is that in the TDX trust model, the virtual machine
+monitor (think Qemu) is not trusted. Yet it emulates all virtual
+devices. This means all devices are potential machiavellian devils
+wanting to screw the kernel in the trusted VM. Having completely
+untrusted devices opens a large attack surface to driver code written
+in C, rarely considered security critical.
+
+There is a real-world analogy here. If you are security-minded, you
+want to limit access to the external ports of your laptop. For
+example, [malicious USB
+devices](https://www.youtube.com/watch?v=ZEZIcjhsZEk) can exploit
+vulnerabilities in the operating system's USB stack to gain code
+execution. But at least internal devices without exposed ports are out
+of the attacker's reach.
+
+With TDX, the attack surface includes _all_ device drivers 😭. All devices
+are fair game from the attacker's perspective. The malicious VMM can
+craft problematic responses from any device, such as the PCI
+Configuration Space or VirtIO.
+
+So what does this mean? Running a standard OS in a TDX Trusted Domain
+(TD) instead of plain VMs gives little additional security if the
+attacker is the cloud vendor. The attacker will eventually find
+vulnerable device drivers to exploit because device drivers are not
+typically written in a way where they consider the device's responses
+malicious.
+
+But what is there to do about this? While you can minimize drivers in
+the VM to the bare minimum or run a custom high-security OS in the VM,
+this takes away the charm of running a stock OS in the trusted VM. You
+could rewrite all drivers and formally verify them. But that won't
+happen any time soon. In reality, people will just run Ubuntu.
+
+You could also implement device emulation in the TDX module, but there
+are problems:
+
+- You can't do it because it's not open but "shared" source. 
+- Only Intel can sign the module so the CPU accepts it. 
+- Itould only increase the attack surface of this monolithic blob that
+  you have to trust for the complete security of TDX.
+
+People assume that with TDX, you don't have to trust the cloud vendor
+when you run your Ubuntu there. This is clearly false. You cannot
+deploy a standard application into a TDX VM and expect it to be secure
+from the cloud vendor.
+
+TDX limits exposure to certain classes of attacks. For example, it is
+hard for the on-call engineer with access to a VM host to extract
+secrets from a TDX TD. Yet TDX does not provide protection against an
+entirely malicious cloud vendor that can arbitrarily deploy device
+emulation code.
+
+But then there is also the burden on the end user. Suppose you don't
+do remote attestation and bind your secrets to the VM's configuration
+using Trusted Computing magic. In that case, TDX brings no benefit at
+all. You can't tell whether your VM runs inside a TDX TD or some
+software emulation of it.
+
+Not all is lost, though. Check out my previous blog post, which shows
+a way that sidesteps these problems by allowing devices to be
+trustworthy. Ultimately, it comes down to the cloud vendor becoming
+trustworthy and not only trusted. Confidential computing technologies,
+such as Intel TDX, are a puzzle piece. Still, there is no trustworthy
+virtualization without a trustworthy virtualization stack.
+
+
