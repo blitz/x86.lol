@@ -24,6 +24,10 @@ theme: minima
 plugins:
   - jekyll-feed
 
+# Theme configuration
+minima:
+  date_format: "%Y-%m-%d"
+
 exclude:
   - "*.nix"
   - "*.lock"
