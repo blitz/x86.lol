@@ -8,6 +8,9 @@ baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://x86.lol" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: blitzclone
 github_username:  blitz
+mastodon:
+  - username: blitz
+    instance: infosec.exchange
 
 authors:
   julian:
