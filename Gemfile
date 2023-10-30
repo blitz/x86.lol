@@ -4,3 +4,4 @@ gem 'jekyll-feed'
 
 gem "jekyll", "~> 3.9"
 gem "bigdecimal"
+gem "webrick"
