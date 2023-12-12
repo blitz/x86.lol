@@ -12,6 +12,14 @@ mastodon:
   - username: blitz
     instance: infosec.exchange
 
+# Minima 2.5.1 only knows Google Analytics, but we want to use
+# plausible. So we activate Google Analytics, but replace the actual
+# code in _includes/google-analytics.html.
+#
+# If Minima ever has a new release, we can use
+# _includes/custom-head.html instead.
+google_analytics: this-is-not-used
+
 authors:
   julian:
     name: Julian Stecklina
