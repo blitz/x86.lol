@@ -13,7 +13,7 @@ Computing](https://en.wikipedia.org/wiki/Confidential_computing).
 
 ## tl;dr
 
-Complexity frequently leands to security issues. Adding support for a
+Complexity frequently leads to security issues. Adding support for a
 bunch of confidential computing technologies to KVM increases its
 complexity and thus softens its security stance.
 
@@ -42,7 +42,7 @@ lots of legacy. The complexity of KVM reflects that. Also, KVM has
 often been the first public implementation of many virtualization
 features and thus can't enjoy the benefit of hindsight. It also has
 many users, so rectifying any unfortunate API design or implementation
-choice is extremely hard because someone's problem is another person's
+choice is tough because someone's problem is another person's
 feature.
 
 Given the complexities, our open-source virtualization stack would
@@ -53,8 +53,7 @@ developing mutually incompatible confidential computing solutions.
 
 AMD, Intel, and ARM designed their confidential computing projects so
 they can be bolted onto the existing software stack. As such, each of
-these technologies adds not only thousands of lines of code to KVM but
-also further increases the complexity of the code base. Due to the
+these technologies adds thousands of lines of code to KVM and further increases the code base's complexity. Due to the
 increased complexity, we now unsurprisingly see security issues in the
 modified code.
 
