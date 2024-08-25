@@ -81,7 +81,7 @@
             packages = [ config.packages.jekyll_env ];
 
             shellHook = ''
-              exec jekyll serve --watch --drafts
+              exec jekyll serve --watch --drafts --livereload
             '';
           };
 
