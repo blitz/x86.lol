@@ -344,3 +344,5 @@ There are lots of pieces missing in the example that I would like to add:
 
 If you feel like experimenting with any of these features, please open
 a PR or drop me a message. I would love to see what you did!
+
+PS. If you need consulting, reach out to [Cyberus Technology](https://cyberus-technology.de/en/contact).
