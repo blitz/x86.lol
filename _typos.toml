@@ -2,3 +2,4 @@
 # Don't correct readelf output
 ATTRIBUT = "ATTRIBUT"
 Siz = "Siz"
+TME= "TME"
