@@ -50,7 +50,7 @@ NixOS configuration. The terminology that NixOS uses is:
 For me, the name `hostPlatform` is somewhat ambiguous, but these are the names
 we are stuck with.
 
-To configure a NixOS configuration for cross compiling, you can use a
+To configure a NixOS configuration for cross-compiling, you can use a
 module like this:
 
 ```nix
@@ -104,10 +104,9 @@ into the flake outputs. The flake would not be fully encapsulated and thus
 impure. This is one reason why flakes have a bad reputation when it
 comes to cross-compilation.
 
-Despite the misgivings, cross-compiling with flakes actually works
-great. It's just that the flake has to be _prepared_ for
-cross-compilation. Let's go through that for the immutable appliance
-example.
+Despite the misgivings, cross-compiling with flakes works great. It's
+just that the flake has to be _prepared_ for cross-compilation. Let's
+go through that for the immutable appliance example.
 
 When I wrote the example, I aimed for the following outputs for the
 flake:
@@ -182,12 +181,11 @@ that is cross-compiled for all our target architectures like this:
 ```
 
 Note that we can use _the same configuration_ to generate system
-images for x86, RISC-V and ARM and we build all of them on our beefy
+images for x86, RISC-V, and ARM and we build all of them on our beefy
 x86 build boxes! 🤯
 
-It's a nice exercise to make the build platform configurable. I leave
-this as an exercise to the reader. Check out
-[nix-systems](https://github.com/nix-systems/nix-systems) as a
+It's a nice exercise to make the build platform configurable. Check
+out [nix-systems](https://github.com/nix-systems/nix-systems) as a
 starting point.
 
 ## Running the Images
@@ -205,6 +203,7 @@ $ nix develop
 # Build the disk image for version 17 of the appliance.
 $ nix -L build .\#packages.riscv64-linux.appliance_17_image
 
+# Run the disk image as a VM.
 $ qemu-efi riscv64 result/disk.qcow2
 ...
 <<< Welcome to ApplianceOS 24.11.20240906.574d1ea (riscv64) - ttyS0 >>>
@@ -212,9 +211,13 @@ $ qemu-efi riscv64 result/disk.qcow2
 
 applianceos login: root (automatic login)
 
-root@applianceos (version 17) $ uname -a
-Linux applianceos 6.6.49 #1-NixOS SMP Wed Sep  4 11:28:31 UTC 2024 riscv64 GNU/Linux
+root@applianceos (version 17) $ uname -m
+riscv64
 ```
+
+By the way, if you want to know how to run a RISC-V UEFI VM with Qemu,
+check the [`qemu-efi`
+script](https://github.com/blitz/sysupdate-playground/blob/blog-post-2/buildHost.nix#L48).
 
 ## Parting Words
 
