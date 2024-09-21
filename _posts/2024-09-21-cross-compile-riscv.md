@@ -212,7 +212,7 @@ $ qemu-efi riscv64 result/disk.qcow2
 
 applianceos login: root (automatic login)
 
-root@applianceos (version 18) $ uname -a
+root@applianceos (version 17) $ uname -a
 Linux applianceos 6.6.49 #1-NixOS SMP Wed Sep  4 11:28:31 UTC 2024 riscv64 GNU/Linux
 ```
 
