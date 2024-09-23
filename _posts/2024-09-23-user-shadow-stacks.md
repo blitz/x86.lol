@@ -26,7 +26,7 @@ whether you have the following prerequisites:
 - A CPU supporting CET shadow stacks:
   - Intel Tiger Lake or later (?)
   - AMD Zen 3 or later
-- GCC 8 or later (clang also works)
+- GCC 8 or clang 7 or later
 
 With this out of the way, let's get it working. We use a tiny C
 program `test.c` that simulates ROP:
