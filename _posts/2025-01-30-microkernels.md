@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "FOSDEM Edition: Thoughts on the Mikrokernels"
+title:  "FOSDEM Edition: Thoughts on the Microkernels"
 categories: generic
 author: julian
 published: true
