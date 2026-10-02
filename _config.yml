@@ -6,19 +6,12 @@ description: >- # this means to ignore newlines until "baseurl:"
   I'm blogging about low-level topics and my operating system projects on x86 and RISC-V.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "https://x86.lol" # the base hostname & protocol for your site, e.g. http://example.com
-twitter_username: blitzclone
-github_username:  blitz
+
+github_username: blitz
 mastodon:
   - username: blitz
     instance: infosec.exchange
 
-# Minima 2.5.1 only knows Google Analytics, but we want to use
-# plausible. So we activate Google Analytics, but replace the actual
-# code in _includes/google-analytics.html.
-#
-# If Minima ever has a new release, we can use
-# _includes/custom-head.html instead.
-google_analytics: this-is-not-used
 
 authors:
   julian:

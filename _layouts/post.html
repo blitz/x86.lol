@@ -30,9 +30,7 @@ layout: default
     {{ content }}
   </div>
 
-  {%- if site.disqus.shortname -%}
-    {%- include disqus_comments.html -%}
-  {%- endif -%}
+
 
   {% assign cat = page.categories[0] %}
   {% assign cat_list = site.categories[cat] %}
